@@ -22,21 +22,12 @@ public class MainActivity extends AppCompatActivity {
     public void StartButton(View view) {
         EditText enteredTimeLimit = (EditText) findViewById(R.id.timeLimit);
 
-        Log.d("reached here", "inve");
-        String m= String.valueOf(enteredTimeLimit.getText());
-        Log.d("reached here", "string" + m  );
         String value = enteredTimeLimit.getText().toString();
-        Log.d("reached here", "to string");
         int time = Integer.parseInt (value);
-        Log.d("reached here", "tonumber");
         int timeInMillis = time *1000;
 
-
         Intent intent = new Intent(this, Main2Activity.class);
-        Log.d("reached here", "nddls"+ timeInMillis );
-
         intent.putExtra("time",timeInMillis);
-
         startActivity(intent);
     }
 }

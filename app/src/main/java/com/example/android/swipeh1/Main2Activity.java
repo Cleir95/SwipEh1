@@ -36,8 +36,8 @@ public class Main2Activity extends AppCompatActivity {
         int time =k.getIntExtra("time", 0);
 
         final CountDownTimer timer;
-        {
 
+        {
 
 
 
@@ -45,11 +45,14 @@ public class Main2Activity extends AppCompatActivity {
 
 
                 @Override
-                public void onTick(long timeleft) {}
+                public void onTick(long timeleftInMillis) {
+                    int timeLeft = (int)(timeleftInMillis/1000);
+                    displayTimeLeft(timeLeft);
+
+                }
 
                 @Override
                 public void onFinish() {
-                    Log.v("stupid timer", "I am so stupid");
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                             Main2Activity.this);
 
@@ -60,8 +63,13 @@ public class Main2Activity extends AppCompatActivity {
 
                     alertDialogBuilder
                             .setMessage("Score  " + score + "\n Play again");
+                    alertDialogBuilder.setCancelable(false);
+
+
                     alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+
+
                             // if this button is clicked, close
                             // current activity
                             Main2Activity.this.finish();
@@ -81,15 +89,18 @@ public class Main2Activity extends AppCompatActivity {
 
         }
 
+        timer.start();
+
+
 
         myView.setOnTouchListener(new OnSlidingListener(this) {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    timer.start();
-                }
+               // if (event.getAction() == MotionEvent.ACTION_UP) {
+                   // timer.start();
+              //  }
                 return super.onTouch(v, event);
             }
 
@@ -129,5 +140,11 @@ public class Main2Activity extends AppCompatActivity {
     public void displayScore(int score) {
         TextView scoreView = (TextView) findViewById(R.id.score);
         scoreView.setText(String.valueOf(score));
+    }
+
+
+    public void displayTimeLeft(int timeLeft) {
+        TextView scoreView = (TextView) findViewById(R.id.timeDisplay);
+        scoreView.setText(String.valueOf(timeLeft));
     }
 }
