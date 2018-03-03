@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Timer;
+
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -24,7 +26,7 @@ public class Main2Activity extends AppCompatActivity {
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     private Handler customHandler = new Handler();
-
+    int drag = 0;
 
     // public int intValue = getIntent().getIntExtra("fsf", 0);
 
@@ -39,7 +41,7 @@ public class Main2Activity extends AppCompatActivity {
 
         Intent k = getIntent();
         int time = 0;
-        int drag = 0;
+
         if (k != null) {
             time = k.getIntExtra("time", 0);
             drag = k.getIntExtra("drags", 0);
@@ -49,19 +51,28 @@ public class Main2Activity extends AppCompatActivity {
                 countDown(time);
             } else if (!(drag == 0)) {
 
-                startTime = SystemClock.uptimeMillis();
+
+               startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
-                timeSwapBuff += timeInMilliseconds;
-                customHandler.removeCallbacks(updateTimerThread);
-               updateTimerThread. run();
+
+              // updateTimerThread. run();
+
             }
 
         }
 
 
+
+
+
+
         myView.setOnTouchListener(new OnSlidingListener(this) {
 
-            @Override
+
+
+
+
+                                      @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 // if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -89,6 +100,7 @@ public class Main2Activity extends AppCompatActivity {
                 score++;
                 displayScore(score);
                 Log.d("top", "" + score + "");
+                pauseTimer();
                 return true;
             }
 
@@ -97,9 +109,23 @@ public class Main2Activity extends AppCompatActivity {
                 Log.v("swipe", "down");
                 score++;
                 displayScore(score);
+                pauseTimer();
                 return true;
             }
-        });
+
+
+
+
+
+        }
+
+
+        );
+
+
+
+
+
     }
 
 
@@ -176,12 +202,68 @@ public class Main2Activity extends AppCompatActivity {
             secs = secs % 60;
             int milliseconds = (int) (updatedTime % 1000);
             timerView.setText("" + mins + ":"
-                    + String.format("%02d", secs) + ":"
-                    + String.format("%03d", milliseconds));
+                    + String.format("%02d", secs) + ":" +  String.format("%02d", milliseconds));
             customHandler.postDelayed(this, 0);
 
 
         }
     };
+
+    public void pauseTimer() {
+
+        if (drag == score) {
+            Log.d("hdfkjshkja", "score" + score);
+
+            timeSwapBuff += timeInMilliseconds;
+            customHandler.removeCallbacks(updateTimerThread);
+
+
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        Main2Activity.this);
+
+
+                // set title
+                alertDialogBuilder.setTitle("GAME OVER");
+
+                alertDialogBuilder
+                        .setMessage("time  " + "" + (updatedTime/60000) + ":" + (updatedTime/1000) +
+                                ":" + updatedTime % 1000 + "\nPlay again");
+                alertDialogBuilder.setCancelable(false);
+
+
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+
+                        // if this button is clicked, close
+                        // current activity
+                        Main2Activity.this.finish();
+                    }
+                });
+
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+
+
+            }
+
+
+
+
+
+
+
+
+
+        }
+    }
+
+
+
 }
 
