@@ -18,7 +18,7 @@ import android.widget.TextView;
 public class Main2Activity extends AppCompatActivity {
 
     int score = 0;
-    public TextView textView;
+    public TextView timerView;
     long timeInMilliseconds = 0L;
     private long startTime = 0L;
     long timeSwapBuff = 0L;
@@ -29,38 +29,34 @@ public class Main2Activity extends AppCompatActivity {
     // public int intValue = getIntent().getIntExtra("fsf", 0);
 
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         View myView = (View) findViewById(R.id.myView);
-        textView = (TextView) this.findViewById(R.id.time);
+        timerView = (TextView) this.findViewById(R.id.time);
 
 
         Intent k = getIntent();
-        int time =0;
-        if(k!=null) {
+        int time = 0;
+        int drag = 0;
+        if (k != null) {
             time = k.getIntExtra("time", 0);
-            Log.d("kdjfskj","hjks"+ time );
-            countDown(time);
+            drag = k.getIntExtra("drags", 0);
+            Log.d("kdjfskj", "hjks" + time);
+
+            if (!(time == 0)) {
+                countDown(time);
+            } else if (!(drag == 0)) {
+
+                startTime = SystemClock.uptimeMillis();
+                customHandler.postDelayed(updateTimerThread, 0);
+                timeSwapBuff += timeInMilliseconds;
+                customHandler.removeCallbacks(updateTimerThread);
+               updateTimerThread. run();
+            }
 
         }
-
-      /*  Intent dragsIntent = getIntent();
-        int drag =0;
-        if(dragsIntent!=null) {
-            drag=dragsIntent.getIntExtra("drags", 0);
-            startTime = SystemClock.uptimeMillis();
-            customHandler.postDelayed(updateTimerThread, 0);
-            timeSwapBuff += timeInMilliseconds;
-            customHandler.removeCallbacks(updateTimerThread);
-        }*/
-
-
 
 
         myView.setOnTouchListener(new OnSlidingListener(this) {
@@ -68,9 +64,9 @@ public class Main2Activity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-               // if (event.getAction() == MotionEvent.ACTION_UP) {
-                   // timer.start();
-              //  }
+                // if (event.getAction() == MotionEvent.ACTION_UP) {
+                // timer.start();
+                //  }
                 return super.onTouch(v, event);
             }
 
@@ -119,75 +115,73 @@ public class Main2Activity extends AppCompatActivity {
     }
 
 
+    public void countDown(int time) {
+        final CountDownTimer timer;
+        {
+            timer = new CountDownTimer(time, 1000) {
 
-public void countDown(int time) {
-    final CountDownTimer timer;
-    {
-        timer = new CountDownTimer(time, 1000) {
+                @Override
+                public void onTick(long timeleftInMillis) {
+                    int timeLeft = (int) (timeleftInMillis / 1000);
+                    displayTimeLeft(timeLeft);
 
-            @Override
-            public void onTick(long timeleftInMillis) {
-                int timeLeft = (int) (timeleftInMillis / 1000);
-                displayTimeLeft(timeLeft);
+                }
 
-            }
-
-            @Override
-            public void onFinish() {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        Main2Activity.this);
-
-
-                // set title
-                alertDialogBuilder.setTitle("GAME OVER");
-
-                alertDialogBuilder
-                        .setMessage("Score  " + score + "\nPlay again");
-                alertDialogBuilder.setCancelable(false);
+                @Override
+                public void onFinish() {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            Main2Activity.this);
 
 
-                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                    // set title
+                    alertDialogBuilder.setTitle("GAME OVER");
+
+                    alertDialogBuilder
+                            .setMessage("Score  " + score + "\nPlay again");
+                    alertDialogBuilder.setCancelable(false);
 
 
-                        // if this button is clicked, close
-                        // current activity
-                        Main2Activity.this.finish();
-                    }
-                });
+                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
 
-                // create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
+                            // if this button is clicked, close
+                            // current activity
+                            Main2Activity.this.finish();
+                        }
+                    });
 
-                // show it
-                alertDialog.show();
+
+                    // create alert dialog
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+
+                    // show it
+                    alertDialog.show();
 
 
-            }
-        };
+                }
+            };
+        }
+        timer.start();
     }
-    timer.start();
+
+
+    private Runnable updateTimerThread = new Runnable() {
+        @Override
+        public void run() {
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+            int secs = (int) (updatedTime / 1000);
+            int mins = secs / 60;
+            secs = secs % 60;
+            int milliseconds = (int) (updatedTime % 1000);
+            timerView.setText("" + mins + ":"
+                    + String.format("%02d", secs) + ":"
+                    + String.format("%03d", milliseconds));
+            customHandler.postDelayed(this, 0);
+
+
+        }
+    };
 }
 
-
-
-
-/*private Runnable updateTimerThread = new Runnable() {
-    @Override
-    public void run() {
-        timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-        updatedTime = timeSwapBuff + timeInMilliseconds;
-        int secs = (int) (updatedTime / 1000);
-        int mins = secs / 60;
-        secs = secs % 60;
-        int milliseconds = (int) (updatedTime % 1000);
-        time.setText("" + mins + ":"
-                        + String.format("%02d", secs) + ":"
-                        + String.format("%03d", milliseconds));
-        customHandler.postDelayed(this, 0);
-
-
-    }
-};*/
-}

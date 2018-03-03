@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         String value1 = enteredDragLimit.getText().toString();
         Log.d("jdskfjsl", "DRAG" + value1);
 
-       /* if (value.matches("") ) {
+        if (!(value.equals(""))) {
             Log.d("jdskfjsl", "time" + value);
             int time = Integer.parseInt(value);
             Log.d("jdskfjsl", "time" + time);
@@ -40,12 +40,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, Main2Activity.class);
             intent.putExtra("time", timeInMillis);
             startActivity(intent);
-        }*/
+        }
 
-
-        if (value1 != "")
-            Log.d("jdskfjsl", "DRAGreached" + value1);
-        {
+       else if (!(value1.equals(""))) {
             Log.d("jdskfjsl", "DRAG reavhed inside" );
             int drags = Integer.parseInt(value1);
             Log.d("jdskfjsl", "DRAG" + drags);
@@ -54,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("drags", drags);
             startActivity(intent);
         }
+        else {//djfsjfsjlfs
+             }
 
     }
 
