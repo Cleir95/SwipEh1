@@ -1,8 +1,11 @@
 package com.example.android.swipeh1;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -18,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Timer;
 
 import static android.content.ContentValues.TAG;
@@ -55,6 +59,9 @@ public class Main2Activity extends AppCompatActivity {
         }
     };
 
+    public Main2Activity() throws IOException {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,112 +77,110 @@ public class Main2Activity extends AppCompatActivity {
         if (k != null) {
             time = k.getIntExtra("time", 0);
             drag = k.getIntExtra("drags", 0);
-            level1 =k.getStringExtra("easy");
-            level2 =k.getStringExtra("medium");
-            level3 =k.getStringExtra("hard");
+            level1 = k.getStringExtra("easy");
+            level2 = k.getStringExtra("medium");
+            level3 = k.getStringExtra("hard");
 
             Log.d("kdjfskj", "time" + time);
 
             if (!(time == 0)) {
                 countDown(time);
-            }
-
-            else if (!(drag == 0)) {
+            } else if (!(drag == 0)) {
                 startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
-            }
-
-            else if (!(level1==null)){
-                Log.d("main2", "easy level" );
+            } else if (!(level1 == null)) {
+                Log.d("main2", "easy level");
                 myView.setLayoutParams(new LinearLayout.LayoutParams(2000, 2000));
                 countDown(15000);
-            }
-
-            else if (!(level2==null)){
-                Log.d("main2", "medium level" );
+            } else if (!(level2 == null)) {
+                Log.d("main2", "medium level");
                 myView.setLayoutParams(new LinearLayout.LayoutParams(200, 2000));
                 countDown(15000);
-            }
-
-           else  if (!(level3==null)){
-                Log.d("main2", "hard level" );
+            } else if (!(level3 == null)) {
+                Log.d("main2", "hard level");
                 myView.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
                 countDown(15000);
-            }
-
-            else {
-               //kdfsdfjkl
+            } else {
+                //kdfsdfjkl
             }
 
         }
 
 
+        final MediaPlayer mediaPlayer = MediaPlayer.create(Main2Activity.this, R.raw.music);
+
 
         fullScreen.setOnTouchListener(new OnSlidingListener(this) {
 
 
-                                          @Override
-                                          public boolean onTouch(View v, MotionEvent event) {
-                                              Rect rect;
-                                              rect = new Rect(myView.getLeft(), myView.getTop(), myView.getRight(), myView.getBottom());
-                                              if (event.getAction() == MotionEvent.ACTION_UP) {
-                                                  if (!rect.contains((int) event.getX(), (int) event.getY())) {
-                                                      // User moved outside bounds
-                                                      Log.d(TAG, "Movement occurred outside bounds of current screen element");
-                                                      score--;
-                                                      displayScore(score);
-                                                  }
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Rect rect;
+                rect = new Rect(myView.getLeft(), myView.getTop(), myView.getRight(), myView.getBottom());
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "NOT TOUCH THE SCREEN");
+
+                    if (!rect.contains((int) event.getX(), (int) event.getY())) {
+                        // User moved outside bounds
+                        Log.d(TAG, "Movement occurred outside bounds of current screen element");
+                        mediaPlayer.pause();
+                        score--;
+                        displayScore(score);
+                    }
 
 
-                                              }
+                }
 
 
-                                              return super.onTouch(v, event);
-                                          }
+                return super.onTouch(v, event);
+            }
 
 
-                                      });
-
-                myView.setOnTouchListener(new OnSlidingListener(this) {
+        });
 
 
-                                          @Override
-                                          public boolean onSwipeRight() {
-                                              Log.d("right", "" + score + "");
-
-                                              return true;
-                                          }
-
-                                          @Override
-                                          public boolean onSwipeLeft() {
-                                              Log.v("swipe", "left");
-
-                                              return true;
-                                          }
-
-                                          @Override
-                                          public boolean onSwipeTop() {
-                                              Log.v("swipe", "top");
-
-                                              score++;
-                                              displayScore(score);
-                                              Log.d("top", "" + score + "");
-                                              pauseTimer();
-                                              return true;
-                                          }
-
-                                          @Override
-                                          public boolean onSwipeBottom() {
-                                              Log.v("swipe", "down");
-
-                                              score++;
-                                              displayScore(score);
-                                              pauseTimer();
-                                              return true;
-                                          }
+        myView.setOnTouchListener(new OnSlidingListener(this) {
 
 
+                                      @Override
+                                      public boolean onSwipeRight() {
+                                          Log.d("right", "" + score + "");
+                                          mediaPlayer.pause();
+
+                                          return true;
                                       }
+
+                                      @Override
+                                      public boolean onSwipeLeft() {
+                                          Log.v("swipe", "left");
+                                          mediaPlayer.pause();
+                                          return true;
+                                      }
+
+                                      @Override
+                                      public boolean onSwipeTop() {
+                                          Log.v("swipe", "top");
+                                          mediaPlayer.start();
+                                          score++;
+                                          displayScore(score);
+
+                                          Log.d("top", "" + score + "");
+                                          pauseTimer();
+                                          return true;
+                                      }
+
+                                      @Override
+                                      public boolean onSwipeBottom() {
+                                          Log.v("swipe", "down");
+                                          mediaPlayer.start();
+                                          score++;
+                                          displayScore(score);
+                                          pauseTimer();
+                                          return true;
+                                      }
+
+
+                                  }
 
 
         );
@@ -291,6 +296,7 @@ public class Main2Activity extends AppCompatActivity {
     }
 
 
+    // / no need to call prepare(); create() does that for you
     /*public void checkbounder(View v, int x, int y ) {
         Rect rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
         if (event == MotionEvent.ACTION_UP) {
