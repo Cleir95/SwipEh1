@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -29,6 +31,9 @@ public class Main2Activity extends AppCompatActivity {
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
     int drag = 0;
+    String level1;
+    String level2;
+    String level3;
     private long startTime = 0L;
     private Handler customHandler = new Handler();
 
@@ -65,21 +70,45 @@ public class Main2Activity extends AppCompatActivity {
         if (k != null) {
             time = k.getIntExtra("time", 0);
             drag = k.getIntExtra("drags", 0);
-            Log.d("kdjfskj", "hjks" + time);
+            level1 =k.getStringExtra("easy");
+            level2 =k.getStringExtra("medium");
+            level3 =k.getStringExtra("hard");
+
+            Log.d("kdjfskj", "time" + time);
 
             if (!(time == 0)) {
                 countDown(time);
-            } else if (!(drag == 0)) {
+            }
 
-
+            else if (!(drag == 0)) {
                 startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
+            }
 
-                // updateTimerThread. run();
+            else if (!(level1==null)){
+                Log.d("main2", "easy level" );
+                myView.setLayoutParams(new LinearLayout.LayoutParams(2000, 2000));
+                countDown(15000);
+            }
 
+            else if (!(level2==null)){
+                Log.d("main2", "medium level" );
+                myView.setLayoutParams(new LinearLayout.LayoutParams(200, 2000));
+                countDown(15000);
+            }
+
+           else  if (!(level3==null)){
+                Log.d("main2", "hard level" );
+                myView.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
+                countDown(15000);
+            }
+
+            else {
+               //kdfsdfjkl
             }
 
         }
+
 
 
         fullScreen.setOnTouchListener(new OnSlidingListener(this) {
