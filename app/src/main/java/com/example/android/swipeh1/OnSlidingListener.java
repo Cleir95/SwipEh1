@@ -5,10 +5,13 @@ package com.example.android.swipeh1;
  */
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+
+import static android.content.ContentValues.TAG;
 
 public class OnSlidingListener implements View.OnTouchListener {
 
@@ -22,13 +25,44 @@ public class OnSlidingListener implements View.OnTouchListener {
 
 
     public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
 
         return gestureDetector.onTouchEvent(event);
     }
 
+
+
+
+
+
     private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
 
+
+
+      /*  public void outside(View v){
+
+            Rect rect;
+            rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+
+            {
+                Log.d(TAG, "touched the screen");
+
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Construct a rect of the view's bounds
+                    rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+
+                }
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    if (!rect.contains((int) event.getX(), (int) event.getY())) {
+                        // User moved outside bounds
+                        Log.d(TAG, "Movement occurred outside bounds of current screen element");
+
+                    }
+                }
+            }
+        }*/
 
         @Override
         public boolean onDown(MotionEvent e) {
@@ -111,11 +145,15 @@ public class OnSlidingListener implements View.OnTouchListener {
     }
 
 
-    public boolean onSwipeRight( ) { return false;}
+    public boolean onSwipeRight( ) {
+
+        return false;}
 
     public boolean onSwipeLeft() {   return false;}
 
     public boolean onSwipeTop() {  return false;}
 
     public boolean onSwipeBottom() {  return false;}
+
+
 }

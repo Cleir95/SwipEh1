@@ -2,6 +2,7 @@ package com.example.android.swipeh1;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -9,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -16,26 +18,44 @@ import android.widget.TextView;
 
 import java.util.Timer;
 
+import static android.content.ContentValues.TAG;
+
 
 public class Main2Activity extends AppCompatActivity {
 
-    int score = 0;
     public TextView timerView;
+    int score = 0;
     long timeInMilliseconds = 0L;
-    private long startTime = 0L;
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
-    private Handler customHandler = new Handler();
     int drag = 0;
+    private long startTime = 0L;
+    private Handler customHandler = new Handler();
 
     // public int intValue = getIntent().getIntExtra("fsf", 0);
+    private Runnable updateTimerThread = new Runnable() {
+        @Override
+        public void run() {
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+            int secs = (int) (updatedTime / 1000);
+            int mins = secs / 60;
+            secs = secs % 60;
+            int milliseconds = (int) (updatedTime % 1000);
+            timerView.setText("" + mins + ":"
+                    + String.format("%02d", secs) + ":" + String.format("%02d", milliseconds));
+            customHandler.postDelayed(this, 0);
 
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        View myView = (View) findViewById(R.id.myView);
+        final View myView = (View) findViewById(R.id.myView);
+        final View fullScreen = (View) findViewById(R.id.fullscreen);
         timerView = (TextView) this.findViewById(R.id.time);
 
 
@@ -52,94 +72,97 @@ public class Main2Activity extends AppCompatActivity {
             } else if (!(drag == 0)) {
 
 
-               startTime = SystemClock.uptimeMillis();
+                startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
 
-              // updateTimerThread. run();
+                // updateTimerThread. run();
 
             }
 
         }
 
 
+        fullScreen.setOnTouchListener(new OnSlidingListener(this) {
 
 
+                                          @Override
+                                          public boolean onTouch(View v, MotionEvent event) {
+                                              Rect rect;
+                                              rect = new Rect(myView.getLeft(), myView.getTop(), myView.getRight(), myView.getBottom());
+                                              if (event.getAction() == MotionEvent.ACTION_UP) {
+                                                  if (!rect.contains((int) event.getX(), (int) event.getY())) {
+                                                      // User moved outside bounds
+                                                      Log.d(TAG, "Movement occurred outside bounds of current screen element");
+                                                      score--;
+                                                      displayScore(score);
+                                                  }
 
 
-        myView.setOnTouchListener(new OnSlidingListener(this) {
+                                              }
 
 
+                                              return super.onTouch(v, event);
+                                          }
 
 
+                                      });
 
-                                      @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                // if (event.getAction() == MotionEvent.ACTION_UP) {
-                // timer.start();
-                //  }
-                return super.onTouch(v, event);
-            }
+                myView.setOnTouchListener(new OnSlidingListener(this) {
 
 
-            @Override
-            public boolean onSwipeRight() {
-                Log.d("right", "" + score + "");
-                return true;
-            }
+                                          @Override
+                                          public boolean onSwipeRight() {
+                                              Log.d("right", "" + score + "");
 
-            @Override
-            public boolean onSwipeLeft() {
-                Log.v("swipe", "left");
-                return true;
-            }
+                                              return true;
+                                          }
 
-            @Override
-            public boolean onSwipeTop() {
-                Log.v("swipe", "top");
-                score++;
-                displayScore(score);
-                Log.d("top", "" + score + "");
-                pauseTimer();
-                return true;
-            }
+                                          @Override
+                                          public boolean onSwipeLeft() {
+                                              Log.v("swipe", "left");
 
-            @Override
-            public boolean onSwipeBottom() {
-                Log.v("swipe", "down");
-                score++;
-                displayScore(score);
-                pauseTimer();
-                return true;
-            }
+                                              return true;
+                                          }
+
+                                          @Override
+                                          public boolean onSwipeTop() {
+                                              Log.v("swipe", "top");
+
+                                              score++;
+                                              displayScore(score);
+                                              Log.d("top", "" + score + "");
+                                              pauseTimer();
+                                              return true;
+                                          }
+
+                                          @Override
+                                          public boolean onSwipeBottom() {
+                                              Log.v("swipe", "down");
+
+                                              score++;
+                                              displayScore(score);
+                                              pauseTimer();
+                                              return true;
+                                          }
 
 
-
-
-
-        }
+                                      }
 
 
         );
 
 
-
-
-
     }
-
 
     public void displayScore(int score) {
         TextView scoreView = (TextView) findViewById(R.id.score);
         scoreView.setText(String.valueOf(score));
     }
 
-
     public void displayTimeLeft(int timeLeft) {
         TextView scoreView = (TextView) findViewById(R.id.timeDisplay);
         scoreView.setText(String.valueOf(timeLeft));
     }
-
 
     public void countDown(int time) {
         final CountDownTimer timer;
@@ -191,24 +214,6 @@ public class Main2Activity extends AppCompatActivity {
         timer.start();
     }
 
-
-    private Runnable updateTimerThread = new Runnable() {
-        @Override
-        public void run() {
-            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-            updatedTime = timeSwapBuff + timeInMilliseconds;
-            int secs = (int) (updatedTime / 1000);
-            int mins = secs / 60;
-            secs = secs % 60;
-            int milliseconds = (int) (updatedTime % 1000);
-            timerView.setText("" + mins + ":"
-                    + String.format("%02d", secs) + ":" +  String.format("%02d", milliseconds));
-            customHandler.postDelayed(this, 0);
-
-
-        }
-    };
-
     public void pauseTimer() {
 
         if (drag == score) {
@@ -227,7 +232,7 @@ public class Main2Activity extends AppCompatActivity {
                 alertDialogBuilder.setTitle("GAME OVER");
 
                 alertDialogBuilder
-                        .setMessage("time  " + "" + (updatedTime/60000) + ":" + (updatedTime/1000) +
+                        .setMessage("time  " + "" + (updatedTime / 60000) + ":" + (updatedTime / 1000) +
                                 ":" + updatedTime % 1000 + "\nPlay again");
                 alertDialogBuilder.setCancelable(false);
 
@@ -253,17 +258,23 @@ public class Main2Activity extends AppCompatActivity {
             }
 
 
-
-
-
-
-
-
-
         }
     }
 
 
+    /*public void checkbounder(View v, int x, int y ) {
+        Rect rect = new Rect(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        if (event == MotionEvent.ACTION_UP) {
+            if (!rect.contains((int) event.getX(), (int) event.getY())) {
+                // User moved outside bounds
+                Log.d(TAG, "Movement occurred outside bounds of current screen element");
+                ;
+            }
+            else score++;
 
+
+        }
+
+    }*/
 }
 
